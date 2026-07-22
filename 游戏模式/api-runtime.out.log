@@ -116,3 +116,30 @@
 [Nest] 44252  - 2026/07/22 18:20:32     LOG [RouterExplorer] Mapped {/api/game/:id/intel, GET} route +0ms
 [Nest] 44252  - 2026/07/22 18:20:32     LOG [RouterExplorer] Mapped {/api/game/:id/relationships, GET} route +0ms
 [Nest] 44252  - 2026/07/22 18:20:32     LOG [NestApplication] Nest application successfully started +2ms
+18:24:36 [tsx] change in ./..\..\packages\engine\dist\index.js Rerunning...
+18:25:22 [tsx] change in ./..\..\packages\engine\dist\index.js Rerunning...
+18:25:54 [tsx] change in ./..\..\packages\engine\dist\index.js Rerunning...
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [NestFactory] Starting Nest application...
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [InstanceLoader] AppModule dependencies initialized +13ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [InstanceLoader] GameModule dependencies initialized +2ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RoutesResolver] GameController {/api/game}: +321ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game, POST} route +10ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id, GET} route +2ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/actions, GET} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/act, POST} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/log, GET} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/character/:cid, GET} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/party/join, POST} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/party/leave, POST} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/assets, GET} route +2ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/employments, GET} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/employ, POST} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/slaves, GET} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/enslave, POST} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/slave/interact, POST} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/intel, GET} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/relationships, GET} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/inventory, GET} route +1ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [RouterExplorer] Mapped {/api/game/:id/quests, GET} route +0ms
+[Nest] 28380  - 2026/07/22 18:25:55     LOG [NestApplication] Nest application successfully started +2ms
+灰丘领主 API 已启动: http://localhost:4501/api

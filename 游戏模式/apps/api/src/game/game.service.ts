@@ -323,9 +323,13 @@ export class GameService {
   getInventoryList(gameId: string) { this.requireGame(gameId); return { inventory: this.db.getInventory(gameId) }; }
   /** 获取任务 */
   getQuestList(gameId: string) { this.requireGame(gameId); return { quests: this.db.getQuests(gameId) }; }
+
+  /** 获取关系列表 */
+  getRelationshipList(gameId: string) {
     this.requireGame(gameId);
     return { relationships: this.db.getRelationships(gameId) };
   }
+
   /** 奴役角色 */
   enslaveCharacter(gameId: string, characterId: string, slaveType: string) {
     const world = this.requireGame(gameId);
