@@ -1,4 +1,30 @@
 import { describe, expect, it } from 'vitest';
-import { resolveRound, type WorldState } from './index.js';
-const world: WorldState = { round: 1, day: 1, phase: 'night', difficulty: 'survival', seed: 7, food: 1, medicine: 0, silver: 120, playerId: 'p1', actors: [{ id: 'p1', name: '主角', locationId: 'square', health: 100, maxHealth: 100, mental: 100, maxMental: 100, stamina: 80, maxStamina: 100, hunger: 0, alive: true, isPlayer: true }] };
-describe('resolveRound', () => { it('advances a day and consumes food after night', () => { const result = resolveRound(world, [{ actorId: 'p1', kind: 'rest' }]); expect(result.state.day).toBe(2); expect(result.state.food).toBe(0); expect(result.state.phase).toBe('dawn'); }); });
+import { createWorld, resolveTurn } from './index.js';
+
+describe('createWorld', () => {
+  it('creates a world with correct defaults', () => {
+    const world = createWorld({ playerName: '测试', difficulty: 'survival', populationScale: 'small' });
+    expect(world.playerId).toBe('player');
+    expect(world.round).toBe(0);
+    expect(world.day).toBe(1);
+    expect(world.phase).toBe('morning');
+    expect(world.characters.length).toBeGreaterThan(1);
+    expect(world.factions.length).toBeGreaterThan(0);
+    expect(world.locations.length).toBeGreaterThan(5);
+  });
+});
+
+describe('resolveTurn', () => {
+  it('advances round and phase', () => {
+    const world = createWorld({ playerName: '测试', difficulty: 'survival', populationScale: 'small' });
+    const player = world.characters.find(c => c.id === 'player')!;
+    const result = resolveTurn(world,
+      { actorId: 'player', kind: 'rest', label: '休息' },
+      [],
+      0,
+    );
+    expect(result.state.round).toBe(1);
+    expect(result.state.phase).not.toBe('morning');
+    expect(result.events.length).toBeGreaterThan(0);
+  });
+});

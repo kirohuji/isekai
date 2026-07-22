@@ -1,4 +1,4 @@
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import type { ReactNode } from 'react';
 
 // ===== 简单 shadcn 风格组件（无需安装额外依赖） =====

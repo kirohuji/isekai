@@ -16,21 +16,36 @@ export type StatKey = 'health' | 'mental' | 'stamina' | 'hunger';
 
 /** 行动类别 */
 export type ActionKind =
-  | 'move'
-  | 'rest'
-  | 'work'
-  | 'explore'
-  | 'socialize'
-  | 'build'
-  | 'trade'
-  | 'combat'
-  | 'scout'
-  | 'hunt'
-  | 'gather'
-  | 'craft'
-  | 'study'
-  | 'pray'
-  | 'wait';
+  | 'move' | 'rest' | 'work' | 'explore' | 'socialize' | 'build' | 'trade'
+  | 'combat' | 'scout' | 'hunt' | 'gather' | 'craft' | 'study' | 'pray' | 'wait'
+  | 'eat' | 'sleep' | 'patrol' | 'train' | 'heal' | 'entertain' | 'night_interact';
+
+/** 行动模板（存储在DB中，运行时按条件过滤） */
+export interface ActionTemplate {
+  id: string;
+  kind: ActionKind;
+  label: string;                // 显示名，如"在旅馆休息"
+  detail?: string;              // 额外描述
+  category: string;             // '生存'|'探索'|'经济'|'社交'|'建设'|'战斗'|'特殊'
+  costPhases: number;           // 时段消耗
+  costStamina: number;          // 体力消耗（负值=恢复）
+  costHunger: number;           // 饥饿增长
+  // 条件（全部满足才显示）
+  conditions: ActionConditions;
+}
+
+export interface ActionConditions {
+  locationType?: string[];       // 需要特定地点类型（'inn'|'market'|'wild'|'temple'|'any'）
+  locationHas?: string[];        // 需要地点拥有（'shelter'|'water'|'bed'|'food_source'）
+  phase?: Phase[];               // 需要特定时段
+  requiresAsset?: string[];      // 需要拥有特定资产类型
+  requiresPartySkill?: string;   // 需要队伍中有人拥有某技能
+  requiresItem?: string;         // 需要持有某物品
+  minStats?: Partial<Record<StatKey, number>>;  // 最低属性要求
+  maxHunger?: number;            // 饥饿低于此值才能做
+  playerOnly?: boolean;          // 只有玩家可执行
+  emergencyAction?: boolean;     // 紧急行动（饥饿/残血时强制弹出）
+}
 
 /** 角色属性（用于技能检定） */
 export interface Attributes {
@@ -85,8 +100,212 @@ export interface CharacterState {
   // 关系
   factionId: string;       // 所属势力
   gold: number;            // 个人金币
+  // 队伍
+  partyRole?: 'leader' | 'member' | 'none'; // 在玩家队伍中的角色
 }
 
+/** 资产/契约 —— 抽象化：覆盖旅馆、土地、执照、合同等 */
+export interface Asset {
+  id: string;
+  name: string;            // e.g. "旧鹿角旅馆契约"
+  assetType: 'property' | 'business' | 'land' | 'license' | 'contract' | 'equipment';
+  description: string;
+  value: number;            // 市值（可出售价格）
+  dailyIncome: number;      // 每日净收入（收入-维护费）
+  dailyUpkeep: number;      // 每日维护费
+  locationId: string;
+  acquiredRound: number;
+  isActive: boolean;
+}
+
+/** 雇佣关系 */
+export interface Employment {
+  id: string;
+  employeeId: string;       // 被雇佣角色ID
+  employerId: string;       // 雇主ID（通常是player）
+  role: string;             // '厨娘', '守卫', '记账员', '农工' etc
+  salary: number;           // 每日工资
+  hiredRound: number;
+  loyalty: number;          // 0-100，影响效率和是否离职
+  isActive: boolean;
+}
+
+/** 队伍信息 */
+export interface PartyInfo {
+  leaderId: string;
+  members: PartyMember[];
+}
+
+export interface PartyMember {
+  characterId: string;
+  role: string;             // '队长', '成员', '临时跟随'
+  joinedRound: number;
+}
+
+/** 关系（双向） */
+export interface Relationship {
+  characterA: string;
+  characterB: string;
+  affection: number;       // -100 → +100
+  trust: number;           // 0-100
+  status: string;
+  lastInteractionRound: number;
+}
+
+/** 奴隶状态 */
+export interface SlaveState {
+  ownerId: string;
+  slaveType: 'labor' | 'domestic' | 'sex' | 'combat' | 'skilled';
+  obedience: number;
+  fear: number;
+  breakingProgress: number;
+  escapeAttempts: number;
+  lastNightInteractRound: number;
+}
+
+/** 情报 */
+export interface Intel {
+  id: string;
+  content: string;
+  category: 'rumor' | 'military' | 'economic' | 'political' | 'personal' | 'threat';
+  source: string;
+  truthProbability: number; // 0-100
+  acquiredRound: number;
+  expiryDay: number;
+  isVerified: boolean;
+  relatedCharacterId?: string;
+  relatedLocationId?: string;
+}
+// ============================================================
+// 规则/效果引擎 —— 核心抽象
+// ============================================================
+
+/** 规则条件类型 */
+export type ConditionType =
+  | 'stat_check'       // {stat, op:'lt'|'gt'|'lte'|'gte', value}
+  | 'location_has'     // {feature:'bed'|'shelter'|'water'|'temple'|'market'|'tavern'}
+  | 'location_type'    // {type:'town'|'city'|'wild'|'village'|'border'}
+  | 'phase_is'         // {phase:'night'|'dawn'|...}
+  | 'weather_is'       // {weather:'rain'|'storm'|'clear'|'fog'|'snow'}
+  | 'has_item'         // {itemType:'food'|'medicine'|'weapon'}
+  | 'has_status'       // {statusType:'injured'|'sick'|'blessed'|'cursed'|'terrified'}
+  | 'has_asset'        // {assetType:'property'|'license'|...}
+  | 'has_relation'     // {withCharId, minAffection, maxAffection}
+  | 'has_slave'        // {slaveType:'sex'|'labor'|...}
+  | 'flag_check'       // {flagName, equals}
+  | 'random_chance'    // {probability:0-1}
+  | 'every_n_rounds'   // {interval}, fires when round % interval === 0
+  | 'day_changed'      // {} fires when day increments
+  | 'phase_changed'    // {} fires when phase changes
+  | 'npc_nearby'       // {minCount, maxDistance}
+  | 'player_did'       // {actionKind} — player performed specific action
+  ;
+
+/** 规则效果类型 */
+export type EffectType =
+  | 'stat_mod'          // {stat, delta}
+  | 'add_status'        // {statusType, magnitude, duration}
+  | 'remove_status'     // {statusType}
+  | 'trigger_event'     // {eventId} — fire an event template
+  | 'modify_relation'   // {charA, charB, affectionDelta, trustDelta}
+  | 'spawn_npc'         // {npcTemplateId, atLocation}
+  | 'spawn_item'        // {itemName, quantity, atLocation}
+  | 'generate_intel'    // {category, truthBase} — AI fills content
+  | 'modify_action_cost'// {actionKind, staminaMult, hungerMult}
+  | 'unlock_action'     // {actionKind} — temporarily add to available actions
+  | 'lock_action'       // {actionKind} — temporarily remove
+  | 'narrative_hint'    // {topic, mood} — tells AI to mention in narrative
+  | 'weather_change'    // {newWeather, intensity, duration}
+  | 'set_flag'          // {flagName, value}
+  | 'daily_income_mod'  // {delta} — modify asset income
+  | 'spawn_event_chain' // {chainName} — seed a chain of related events
+  | 'give_item'         // {itemName, itemType, quantity, value}
+  | 'add_quest'         // {questId, name, description, objectives[], rewards{}}
+  | 'update_quest'      // {questId, objectiveId, progress}
+  ;
+
+/** 规则条件 */
+export interface RuleCondition {
+  type: ConditionType;
+  params: Record<string, unknown>;
+}
+
+/** 规则效果 */
+export interface RuleEffect {
+  type: EffectType;
+  params: Record<string, unknown>;
+}
+
+/** 规则 = 条件集合 → 效果集合 */
+export interface Rule {
+  id: string;
+  name: string;
+  description: string;        // AI 填充
+  category: 'weather' | 'location' | 'status' | 'asset' | 'relationship' | 'event' | 'world' | 'player_action' | 'ai_generated';
+  conditions: RuleCondition[];
+  effects: RuleEffect[];
+  duration: number;           // 0=永久(条件满足即激活), >0=剩余回合
+  removalConditions?: RuleCondition[]; // 提前解除条件
+  source: string;             // 来源描述
+  causalParent?: string;      // 父规则ID（因果链）
+  priority: number;           // 越高越先执行
+  activeSince: number;        // 激活回合
+  isActive: boolean;
+}
+
+/** 天气 */
+export interface Weather {
+  type: 'clear' | 'rain' | 'storm' | 'fog' | 'snow' | 'heatwave';
+  intensity: number; // 1-10
+  description: string;
+  remainingRounds: number;
+}
+
+/** 物品（背包中） */
+export interface InventoryItem {
+  id: string;
+  name: string;
+  itemType: 'food' | 'medicine' | 'weapon' | 'armor' | 'tool' | 'material' | 'document' | 'currency' | 'misc';
+  quantity: number;
+  description: string;
+  value: number;          // 单价
+  effects?: Record<string, number>; // e.g. {health_restore:15, hunger_restore:10}
+  isEquipped: boolean;
+  equippedSlot?: 'weapon' | 'armor' | 'accessory';
+}
+
+/** 任务 */
+export interface Quest {
+  id: string;
+  name: string;
+  description: string;
+  category: 'main' | 'side' | 'personal' | 'faction' | 'survival' | 'ai_generated';
+  status: 'active' | 'completed' | 'failed' | 'abandoned';
+  objectives: QuestObjective[];
+  rewards: QuestReward;
+  giverId?: string;         // 谁给的
+  deadlineDay?: number;     // 截止日
+  acquiredRound: number;
+  completedRound?: number;
+}
+
+export interface QuestObjective {
+  id: string;
+  description: string;      // "收集5个药草"、"到达苇水村"
+  type: 'collect' | 'reach' | 'kill' | 'talk' | 'build' | 'survive' | 'acquire_asset' | 'custom';
+  target: string;           // 目标ID或名称
+  required: number;         // 需要的数量
+  current: number;          // 当前进度
+  isCompleted: boolean;
+}
+
+export interface QuestReward {
+  gold?: number;
+  items?: Array<{ name: string; quantity: number }>;
+  reputation?: Record<string, number>;  // faction → delta
+  affection?: Record<string, number>;   // charId → delta
+  unlockAsset?: string;                 // 资产ID
+}
 /** 状态效果 */
 export interface StatusEffect {
   type: string;            // injured / sick / blessed / cursed / enraged / terrified
@@ -166,6 +385,27 @@ export interface WorldState {
   // 全局资源
   globalFood: number;
   globalStability: number;   // 全局稳定度 0-100
+
+  // 玩家资产/契约
+  assets: Asset[];
+  // 雇佣关系
+  employments: Employment[];
+  // 队伍
+  party: PartyInfo;
+  // 关系网络
+  relationships: Relationship[];
+  // 奴隶
+  slaves: SlaveState[];
+  // 情报库
+  intel: Intel[];
+  // 活跃规则（条件→效果）
+  rules: Rule[];
+  // 天气
+  weather: Weather;
+  // 背包
+  inventory: InventoryItem[];
+  // 任务
+  quests: Quest[];
 }
 
 /** 玩家意图 */
@@ -325,6 +565,13 @@ export const ACTION_COST: Record<ActionKind, { stamina: number; phases: number; 
   study:     { stamina: 6,  phases: 1, hunger: 2  },
   pray:      { stamina: 3,  phases: 1, hunger: 1  },
   wait:      { stamina: 3,  phases: 1, hunger: 2  },
+  eat:       { stamina: -5, phases: 1, hunger: -15 },
+  sleep:     { stamina: -20,phases: 2, hunger: 2  },
+  patrol:    { stamina: 10, phases: 1, hunger: 3  },
+  train:     { stamina: 14, phases: 2, hunger: 4  },
+  heal:      { stamina: 10, phases: 1, hunger: 2  },
+  entertain: { stamina: 6,  phases: 2, hunger: 3  },
+  night_interact: { stamina: -5, phases: 1, hunger: 1 },
 };
 
 /** 死亡阈值 */

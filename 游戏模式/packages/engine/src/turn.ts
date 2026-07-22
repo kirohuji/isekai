@@ -1,4 +1,4 @@
-import type { WorldState, GameEvent, Intent, NpcDecision, Difficulty, NarrativeHint } from './types.js';
+import type { WorldState, GameEvent, Intent, NpcDecision, Difficulty, NarrativeHint, CharacterState } from './types.js';
 import { createRng, chance } from './config.js';
 import { processStatRegen, consumeStamina, checkDeath } from './stats.js';
 import { generateNpcIntents, resolveFactionActions } from './population.js';
@@ -6,6 +6,7 @@ import { autoCombat, shouldFight } from './combat.js';
 import { ACTION_COST, PHASES, DIFFICULTY_CONFIG, DEATH_THRESHOLDS } from './types.js';
 import type { TurnResolution, DeathRecord, FactionAction } from './types.js';
 import { clamp } from './config.js';
+import { processRules } from './rules.js';
 
 /**
  * 回合结算引擎 · 核心
@@ -18,6 +19,7 @@ import { clamp } from './config.js';
  * 5. 处理每日/每回合消耗与恢复
  * 6. 检查死亡
  * 7. 生成事件与叙事提示
+ * 8. 处理规则引擎（条件→效果）
  */
 export function resolveTurn(
   world: WorldState,
@@ -322,10 +324,20 @@ export function resolveTurn(
     relatedLocations: [],
   });
 
+  // 阶段8：规则引擎 + 天气衰减
+  if (state.weather.remainingRounds > 0) {
+    state.weather.remainingRounds--;
+    if (state.weather.remainingRounds <= 0) {
+      state.weather = { type: 'clear', intensity: 1, description: '天空放晴', remainingRounds: 0 };
+    }
+  }
+  const ruleEvents = processRules(state);
+  events.push(...ruleEvents);
+
   return {
     state,
     events,
-    playerEvents,
+    playerEvents: [...playerEvents, ...ruleEvents.filter(e => e.category === 'world' || e.actorId === state.playerId)],
     factionActions,
     deaths,
     narrativeHints,

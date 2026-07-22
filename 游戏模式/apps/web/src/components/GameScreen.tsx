@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { StatusBar } from './StatusBar';
 import { NarrativePanel } from './NarrativePanel';
 import { ActionPanel } from './ActionPanel';
@@ -6,7 +6,8 @@ import { TurnAnimation } from './TurnAnimation';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from './ui';
 import { api } from '../lib/api';
 import { PHASE_NAMES } from '../lib/utils';
-import type { GameResponse, ActionItem } from '../lib/api';
+import type { GameResponse, RegularAction, DynamicAction } from '../lib/api';
+import { InfoPanel } from './InfoPanel';
 import { MapPin, Users, TrendingUp, Skull, Globe } from 'lucide-react';
 
 interface GameScreenProps {
@@ -16,44 +17,55 @@ interface GameScreenProps {
 
 export function GameScreen({ initial, onNewGame }: GameScreenProps) {
   const [game, setGame] = useState<GameResponse>(initial);
+  const [regularActions, setRegularActions] = useState<RegularAction[]>([]);
+  const [dynamicActions, setDynamicActions] = useState<DynamicAction[]>([]);
   const [busy, setBusy] = useState(false);
   const [animating, setAnimating] = useState(false);
   const [error, setError] = useState('');
+  const [prevDay, setPrevDay] = useState(initial.day);
+  const [prevPhase, setPrevPhase] = useState(initial.phase);
 
-  const handleAction = useCallback(async (action: ActionItem) => {
-    setBusy(true);
-    setError('');
-    setAnimating(true);
+  const loadActions = useCallback(async () => {
+    try {
+      const { regularActions: reg, dynamicActions: dyn } = await api.getActions(game.gameId);
+      setRegularActions(reg);
+      setDynamicActions(dyn);
+    } catch { /* ignore */ }
+  }, [game.gameId]);
+
+  useEffect(() => { loadActions(); }, [loadActions]);
+
+  const handleAction = useCallback(async (action: { kind: string; targetId?: string; label: string; detail?: string }) => {
+    setBusy(true); setError(''); setAnimating(true);
+    setPrevDay(game.day);
+    setPrevPhase(game.phase);
     try {
       const result = await api.act(game.gameId, {
-        kind: action.kind,
-        targetId: action.targetId,
-        label: action.label,
+        kind: action.kind, targetId: action.targetId, label: action.label, detail: action.detail,
       });
-      // 等动画完成再更新状态
       setTimeout(() => {
         setGame(result);
         setAnimating(false);
         setBusy(false);
+        loadActions();
       }, 3200);
     } catch (e) {
       setError(e instanceof Error ? e.message : '行动执行失败');
-      setAnimating(false);
-      setBusy(false);
+      setAnimating(false); setBusy(false);
     }
-  }, [game.gameId]);
+  }, [game.gameId, game.day, game.phase, loadActions]);
 
   const phaseName = PHASE_NAMES[game.phase] ?? game.phase;
   const playerDead = !game.player.alive;
-
-  // 检查是否有来自act的actions（更完整）
-  const actions = game.actions ?? [];
   
   return (
     <>
       {/* 过场动画 */}
       <TurnAnimation
         isActive={animating}
+        day={prevDay}
+        newDay={game.day}
+        phaseLabel={phaseName}
         onComplete={() => {}}
       />
 
@@ -98,43 +110,20 @@ export function GameScreen({ initial, onNewGame }: GameScreenProps) {
                     day={game.day}
                     phase={game.phase}
                     phaseName={phaseName}
+                    prevPhase={prevPhase}
                   />
                 </CardContent>
               </Card>
 
-              {/* 世界统计 */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>🌐 世界概况</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2.5">
-                  <StatRow icon={<Users size={13} />} label="核心角色" value={`${game.stats.aliveCore}/${game.stats.totalCore}`} />
-                  <StatRow icon={<Globe size={13} />} label="势力" value={`${game.stats.totalFactions}`} />
-                  <StatRow icon={<MapPin size={13} />} label="地点" value={`${game.stats.totalLocations}`} />
-                  <StatRow icon={<TrendingUp size={13} />} label="稳定度" value={`${game.stats.globalStability}/100`} />
-                  <StatRow icon={<Skull size={13} />} label="红月" value={`约${game.redMoonCountdown}天`} />
-                </CardContent>
-              </Card>
-
-              {/* 附近角色 */}
-              {game.nearbyCharacters.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>👥 附近</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-1.5">
-                    {game.nearbyCharacters.map(c => (
-                      <div key={c.id} className="flex items-center justify-between text-xs">
-                        <span className="text-stone-300">{c.name}</span>
-                        <span className="text-stone-600">
-                          {c.race} · ⚔{c.combat}
-                          {c.isCore && <Badge variant="warning" className="ml-1">★</Badge>}
-                        </span>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+              {/* 世界统计 + 队伍/资产/附近管理 */}
+              <InfoPanel
+                gameId={game.gameId}
+                nearbyCharacters={game.nearbyCharacters}
+                party={game.party}
+                assets={game.assets}
+                employments={game.employments}
+                onRefresh={() => loadActions()}
+              />
 
               {/* 繁忙提示 */}
               {busy && (
@@ -149,10 +138,12 @@ export function GameScreen({ initial, onNewGame }: GameScreenProps) {
               <NarrativePanel
                 narrative={game.recentNarrative}
                 location={game.location}
+                worldReview={game.worldReview}
               />
 
               <ActionPanel
-                actions={actions}
+                regularActions={regularActions}
+                dynamicActions={dynamicActions}
                 onAction={handleAction}
                 busy={busy}
                 playerDead={playerDead}

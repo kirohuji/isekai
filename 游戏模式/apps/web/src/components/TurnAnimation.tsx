@@ -3,78 +3,79 @@ import { cn } from '../lib/utils';
 
 interface TurnAnimationProps {
   isActive: boolean;
+  day: number;
+  newDay: number;
+  phaseLabel: string;
   onComplete: () => void;
 }
 
-/** 回合过场动画：模拟时间流逝 */
-export function TurnAnimation({ isActive, onComplete }: TurnAnimationProps) {
-  const [phase, setPhase] = useState(0);
+const STEPS = [
+  { icon: '⏳', text: '计时流逝...' },
+  { icon: '🌍', text: '势力博弈...' },
+  { icon: '⚔️', text: '冲突结算...' },
+  { icon: '📜', text: '因果编织...' },
+  { icon: '✨', text: '新状态就绪' },
+];
+
+export function TurnAnimation({ isActive, day, newDay, phaseLabel, onComplete }: TurnAnimationProps) {
+  const [step, setStep] = useState(0);
+  const dayChanged = newDay > day;
 
   useEffect(() => {
     if (!isActive) return;
-    setPhase(0);
-    
-    // 快速动画：5个阶段，每阶段600ms，总共约3秒
+    setStep(0);
     const timer = setInterval(() => {
-      setPhase(p => {
-        if (p >= 4) {
+      setStep(p => {
+        if (p >= STEPS.length - 1) {
           clearInterval(timer);
-          setTimeout(onComplete, 300);
-          return 4;
+          setTimeout(onComplete, 400);
+          return p;
         }
         return p + 1;
       });
-    }, 600);
-
+    }, 550);
     return () => clearInterval(timer);
   }, [isActive, onComplete]);
 
   if (!isActive) return null;
 
-  const phases = [
-    { icon: '⏳', text: '世界在运转...', sub: '所有角色同步行动中' },
-    { icon: '🌍', text: '势力在博弈...', sub: '劫掠、交易、扩张' },
-    { icon: '⚔️', text: '冲突在发生...', sub: '同地点的角色可能发生战斗' },
-    { icon: '📜', text: '因果在编织...', sub: '事件被记录到世界日志' },
-    { icon: '✨', text: '新回合准备就绪', sub: '正在生成叙事...' },
-  ];
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="text-center space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm">
+      <div className="text-center space-y-5 max-w-sm">
         {/* 图标 */}
-        <div className={cn(
-          'text-6xl transition-all duration-500',
-          phase < 4 ? 'animate-bounce' : 'scale-110'
-        )}>
-          {phases[phase].icon}
+        <div className={cn('text-6xl transition-all duration-500', step < STEPS.length - 1 ? 'animate-bounce' : 'scale-110')}>
+          {STEPS[step].icon}
         </div>
 
-        {/* 文字 */}
-        <div>
-          <p className={cn(
-            'text-2xl font-serif text-amber-200 transition-all duration-500',
-            phase === 4 && 'text-emerald-300'
-          )}>
-            {phases[phase].text}
-          </p>
-          <p className="text-sm text-stone-500 mt-1">
-            {phases[phase].sub}
-          </p>
+        {/* 主文本 */}
+        <p className={cn('text-2xl font-serif transition-all duration-500', step === STEPS.length - 1 ? 'text-emerald-300' : 'text-amber-200')}>
+          {STEPS[step].text}
+        </p>
+
+        {/* 时间变化指示 */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900/80 border border-amber-800/30">
+          <span className="text-stone-500">第{day}天</span>
+          <span className="text-amber-400">→</span>
+          <span className={cn('text-lg font-bold', dayChanged ? 'text-amber-300' : 'text-stone-300')}>
+            第{newDay}天
+          </span>
+          <span className="text-stone-600 mx-1">|</span>
+          <span className="text-sm text-amber-300">{phaseLabel}</span>
         </div>
 
-        {/* 进度条 */}
+        {/* 跨天提醒 */}
+        {dayChanged && (
+          <p className="text-amber-400/80 text-sm animate-pulse">
+            🌅 新的一天开始了！每日消耗已结算。
+          </p>
+        )}
+
+        {/* 进度点 */}
         <div className="flex gap-2 justify-center">
-          {phases.map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'w-2 h-2 rounded-full transition-all duration-300',
-                i < phase ? 'bg-amber-500 scale-100' :
-                i === phase ? 'bg-amber-400 scale-125 animate-pulse' :
-                'bg-stone-700'
-              )}
-            />
+          {STEPS.map((_, i) => (
+            <div key={i} className={cn('w-2 h-2 rounded-full transition-all duration-300',
+              i < step ? 'bg-amber-500' : i === step ? 'bg-amber-400 scale-125 animate-pulse' : 'bg-stone-700'
+            )} />
           ))}
         </div>
       </div>

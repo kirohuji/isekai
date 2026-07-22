@@ -6,3 +6,5 @@ dist/
 *.db-wal
 coverage/
 *.tsbuildinfo
+api-runtime.err.log
+api-runtime.out.log

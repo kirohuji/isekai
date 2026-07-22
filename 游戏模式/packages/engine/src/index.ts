@@ -9,3 +9,4 @@ export * from './population.js';
 export * from './combat.js';
 export * from './turn.js';
 export * from './world.js';
+export * from './rules.js';

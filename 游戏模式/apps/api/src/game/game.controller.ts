@@ -6,38 +6,40 @@ import { NewGameDto, ActDto } from './dto/game.dto.js';
 export class GameController {
   constructor(private readonly game: GameService) {}
 
-  /** POST /api/game — 创建新游戏 */
-  @Post()
-  create(@Body() dto: NewGameDto) {
-    return this.game.createNewGame({
-      name: dto.name,
-      difficulty: dto.difficulty,
-      populationScale: dto.populationScale,
-      seed: dto.seed,
-    });
+  @Post() create(@Body() dto: NewGameDto) {
+    return this.game.createNewGame({ name: dto.name, difficulty: dto.difficulty, populationScale: dto.populationScale, occupation: dto.occupation, seed: dto.seed });
   }
+  @Get(':id') getState(@Param('id') id: string) { return this.game.getGameState(id); }
+  @Get(':id/actions') getActions(@Param('id') id: string) { return this.game.getAvailableActions(id); }
+  @Post(':id/act') act(@Param('id') id: string, @Body() dto: ActDto) { return this.game.executeAction(id, dto); }
+  @Get(':id/log') getLog(@Param('id') id: string) { return this.game.getGameLog(id); }
 
-  /** GET /api/game/:id — 获取游戏状态 */
-  @Get(':id')
-  getState(@Param('id') id: string) {
-    return this.game.getGameState(id);
-  }
+  // 角色详情
+  @Get(':id/character/:cid') getCharacter(@Param('id') id: string, @Param('cid') cid: string) { return this.game.getCharacterDetail(id, cid); }
 
-  /** GET /api/game/:id/actions — 获取可用行动 */
-  @Get(':id/actions')
-  getActions(@Param('id') id: string) {
-    return this.game.getAvailableActions(id);
-  }
+  // 队伍
+  @Post(':id/party/join') partyJoin(@Param('id') id: string, @Body() body: { characterId: string; role?: string }) { return this.game.partyJoin(id, body.characterId, body.role); }
+  @Post(':id/party/leave') partyLeave(@Param('id') id: string, @Body() body: { characterId: string }) { return this.game.partyLeave(id, body.characterId); }
 
-  /** POST /api/game/:id/act — 执行行动 */
-  @Post(':id/act')
-  act(@Param('id') id: string, @Body() dto: ActDto) {
-    return this.game.executeAction(id, dto);
-  }
+  // 资产
+  @Get(':id/assets') getAssets(@Param('id') id: string) { return this.game.getAssets(id); }
+  @Get(':id/employments') getEmployments(@Param('id') id: string) { return this.game.getEmployments(id); }
+  @Post(':id/employ') employ(@Param('id') id: string, @Body() body: { characterId: string; role: string; salary: number }) { return this.game.employCharacter(id, body.characterId, body.role, body.salary); }
 
-  /** GET /api/game/:id/log — 获取完整日志 */
-  @Get(':id/log')
-  getLog(@Param('id') id: string) {
-    return this.game.getGameLog(id);
-  }
+  // 奴隶
+  @Get(':id/slaves') getSlaves(@Param('id') id: string) { return this.game.getSlaves(id); }
+  @Post(':id/enslave') enslave(@Param('id') id: string, @Body() body: { characterId: string; slaveType: string }) { return this.game.enslaveCharacter(id, body.characterId, body.slaveType); }
+  @Post(':id/slave/interact') slaveInteract(@Param('id') id: string, @Body() body: { characterId: string }) { return this.game.slaveNightInteract(id, body.characterId); }
+
+  // 情报
+  @Get(':id/intel') getIntel(@Param('id') id: string) { return this.game.getIntelList(id); }
+
+  // 关系
+  @Get(':id/relationships') getRelationships(@Param('id') id: string) { return this.game.getRelationshipList(id); }
+
+  // 背包
+  @Get(':id/inventory') getInventory(@Param('id') id: string) { return this.game.getInventoryList(id); }
+
+  // 任务
+  @Get(':id/quests') getQuests(@Param('id') id: string) { return this.game.getQuestList(id); }
 }

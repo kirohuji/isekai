@@ -1,6 +1,12 @@
 import { IsString, IsIn, IsOptional, MinLength, MaxLength } from 'class-validator';
 import type { Difficulty, PopulationScale, ActionKind } from '@gray-hill/engine';
 
+/** 主角职业背景 ID */
+export const OCCUPATION_IDS = [
+  'student', 'accounting', 'debateteam', 'medstudent', 'athlete',
+  'programmer', 'farmkid', 'delinquent', 'bookworm', 'chef', 'artist', 'orphan',
+] as const;
+
 export class NewGameDto {
   @IsString()
   @MinLength(1)
@@ -12,6 +18,10 @@ export class NewGameDto {
 
   @IsIn(['small', 'medium', 'large'])
   populationScale: PopulationScale = 'small';
+
+  @IsOptional()
+  @IsIn(OCCUPATION_IDS)
+  occupation?: string;
 
   @IsOptional()
   @IsString()

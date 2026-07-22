@@ -78,6 +78,16 @@ export function createWorld(input: NewGameInput): WorldState {
     locations,
     globalFood: diffConfig.startingFood * 100,
     globalStability: input.difficulty === 'doom' ? 30 : input.difficulty === 'survival' ? 50 : 70,
+    assets: [],
+    employments: [],
+    party: { leaderId: 'player', members: [] },
+    relationships: [],
+    slaves: [],
+    intel: [],
+    rules: [],
+    weather: { type: 'clear', intensity: 1, description: '春寒料峭，天空灰蒙蒙的', remainingRounds: 18 },
+    inventory: [],
+    quests: [],
   };
 
   return world;

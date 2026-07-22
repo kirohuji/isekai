@@ -84,3 +84,176 @@ SyntaxError: The requested module '@gray-hill/engine' does not provide an export
     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
 
 Node.js v22.22.3
+[Nest] 49628  - 2026/07/22 17:40:03   ERROR [ExceptionHandler] Error: database is locked
+    at new DatabaseService (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\game\database.service.ts:17:13)
+    at Injector.instantiateClass (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\injector.js:430:19)
+    at callback (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\injector.js:72:45)
+    at async Injector.resolveConstructorParams (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\injector.js:180:24)
+    at async Injector.loadInstance (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\injector.js:77:13)
+    at async Injector.loadProvider (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\injector.js:111:9)
+    at async C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\instance-loader.js:56:13
+    at async Promise.all (index 4)
+    at async InstanceLoader.createInstancesOfProviders (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\instance-loader.js:55:9)
+    at async C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\injector\instance-loader.js:40:13 {
+  code: 'ERR_SQLITE_ERROR',
+  errcode: 261,
+  errstr: 'database is locked'
+}
+(node:41404) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 41404  - 2026/07/22 17:40:26   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::3000 +2ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async bootstrap (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:10:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v22.22.3
+node:internal/modules/package_json_reader:314
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'dotenv' imported from C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:855:18)
+    at defaultResolve (node:internal/modules/esm/resolve:985:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:783:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveBaseSync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:9102)
+    at resolveDirectorySync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:10315)
+    at resolveTsPathsSync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:11547) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.22.3
+node:internal/modules/package_json_reader:314
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'dotenv' imported from C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:314:9)
+    at packageResolve (node:internal/modules/esm/resolve:768:81)
+    at moduleResolve (node:internal/modules/esm/resolve:855:18)
+    at defaultResolve (node:internal/modules/esm/resolve:985:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:783:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveBaseSync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:9102)
+    at resolveDirectorySync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:10315)
+    at resolveTsPathsSync (file:///C:/Users/z1309/Desktop/work/%E5%BC%82%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E6%A8%A1%E5%BC%8F/node_modules/.pnpm/tsx@4.23.1/node_modules/tsx/dist/register-zZ7SWseA.mjs:2:11547) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.22.3
+(node:7800) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 7800  - 2026/07/22 17:52:56   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::4501 +3ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::4501
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async bootstrap (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:12:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4501
+}
+
+Node.js v22.22.3
+(node:28860) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 28860  - 2026/07/22 18:00:56   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::4501 +2ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::4501
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async bootstrap (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:12:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4501
+}
+
+Node.js v22.22.3
+(node:2128) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 2128  - 2026/07/22 18:20:00   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::4501 +3ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::4501
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async bootstrap (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:12:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4501
+}
+
+Node.js v22.22.3
+(node:44252) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 44252  - 2026/07/22 18:20:32   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::4501 +2ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::4501
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async bootstrap (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:12:3) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 4501
+}
+
+Node.js v22.22.3

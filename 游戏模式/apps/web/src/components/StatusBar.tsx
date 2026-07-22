@@ -1,16 +1,24 @@
-import { Heart, Zap, Brain, Beef, Shield, Swords } from 'lucide-react';
+import { Heart, Zap, Brain, Beef, Shield, Swords, Clock, Sunrise } from 'lucide-react';
 import { Progress, Badge } from './ui';
 import type { GameResponse } from '../lib/api';
+import { cn } from '../lib/utils';
+
+const ALL_PHASES = [
+  { key: 'dawn', label: '黎明', icon: '🌅' },
+  { key: 'morning', label: '上午', icon: '☀️' },
+  { key: 'noon', label: '正午', icon: '🔆' },
+  { key: 'afternoon', label: '下午', icon: '🌤️' },
+  { key: 'dusk', label: '傍晚', icon: '🌇' },
+  { key: 'night', label: '夜晚', icon: '🌙' },
+];
 
 interface StatusBarProps {
   player: GameResponse['player'];
-  round: number;
-  day: number;
-  phase: string;
-  phaseName: string;
+  round: number; day: number; phase: string; phaseName: string;
+  prevPhase?: string;
 }
 
-export function StatusBar({ player, round, day, phase, phaseName }: StatusBarProps) {
+export function StatusBar({ player, round, day, phase, phaseName, prevPhase }: StatusBarProps) {
   const healthWarn = player.health < 30;
   const staminaWarn = player.stamina < 25;
   const mentalWarn = player.mental < 25;
@@ -45,15 +53,41 @@ export function StatusBar({ player, round, day, phase, phaseName }: StatusBarPro
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs text-stone-500 uppercase tracking-widest">回合 {round}</p>
-          <p className="text-sm text-stone-400">
-            第{day}天 · <span className="text-amber-300">{phaseName}</span>
+          <p className="text-lg font-serif text-amber-200">
+            第 <span className="text-2xl">{day}</span> 天
           </p>
+          <p className="text-sm text-amber-300/80">{phaseName}</p>
         </div>
         <div className="flex gap-2">
           <Badge variant={player.alive ? 'success' : 'danger'}>
             {player.alive ? '存活' : '死亡'}
           </Badge>
         </div>
+      </div>
+
+      {/* 一天时段进度条 */}
+      <div className="flex items-center gap-0.5">
+        {ALL_PHASES.map((p) => (
+          <div
+            key={p.key}
+            title={p.label}
+            className={cn(
+              'flex-1 h-7 rounded flex items-center justify-center text-xs transition-all duration-500',
+              phase === p.key
+                ? 'bg-amber-700 text-amber-100 font-bold scale-110 shadow-md shadow-amber-900/50'
+                : ALL_PHASES.findIndex(x => x.key === phase) > ALL_PHASES.findIndex(x => x.key === p.key)
+                  ? 'bg-stone-700 text-stone-500'
+                  : 'bg-stone-800 text-stone-600'
+            )}
+          >
+            {p.icon}
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-[10px] text-stone-600 -mt-1">
+        {ALL_PHASES.map(p => (
+          <span key={p.key} className={cn(phase === p.key && 'text-amber-400')}>{p.label}</span>
+        ))}
       </div>
 
       {/* 四项属性 */}
