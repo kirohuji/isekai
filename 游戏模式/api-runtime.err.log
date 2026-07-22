@@ -1,0 +1,86 @@
+(node:37040) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 37040  - 2026/07/22 17:26:21   ERROR [ExceptionsHandler] TypeError: Cannot read properties of undefined (reading 'create')
+    at WorldController.create (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\world.controller.ts:9:63)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\router\router-execution-context.js:38:29
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\router\router-execution-context.js:47:62
+    at async C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\router\router-proxy.js:9:17
+(node:28972) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 28972  - 2026/07/22 17:26:31   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::3000 +5ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async <anonymous> (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:9:1) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v22.22.3
+(node:43688) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+[Nest] 43688  - 2026/07/22 17:26:55   ERROR [NestApplication] Error: listen EADDRINUSE: address already in use :::3000 +3ms
+node:net:1940
+    const ex = new UVExceptionWithHostPort(err, 'listen', address, port);
+               ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at ExpressAdapter.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+platform-express@11_d2e6ebf7459ae9c888d5f67ec87e09f4\node_modules\@nestjs\platform-express\adapters\express-adapter.js:115:32)
+    at C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:190:30
+    at new Promise (<anonymous>)
+    at NestApplication.listen (C:\Users\z1309\Desktop\work\异世界\游戏模式\node_modules\.pnpm\@nestjs+core@11.1.28_@nestj_eae2bcb28ab2d8d31226079b12ae0fc7\node_modules\@nestjs\core\nest-application.js:180:16)
+    at async <anonymous> (C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\main.ts:9:1) {
+  code: 'EADDRINUSE',
+  errno: -4091,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v22.22.3
+C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\game\game.service.ts:4
+import { createRng, pick } from '@gray-hill/engine';
+         ^
+SyntaxError: The requested module '@gray-hill/engine' does not provide an export named 'createRng'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.3
+C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\game\game.service.ts:4
+import { createRng, pick } from '@gray-hill/engine';
+         ^
+SyntaxError: The requested module '@gray-hill/engine' does not provide an export named 'createRng'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.3
+C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api\src\game\game.service.ts:4
+import { createRng, pick } from '@gray-hill/engine';
+         ^
+SyntaxError: The requested module '@gray-hill/engine' does not provide an export named 'createRng'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.22.3

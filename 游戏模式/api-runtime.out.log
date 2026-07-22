@@ -1,0 +1,36 @@
+
+> @gray-hill/api@1.0.0 dev C:\Users\z1309\Desktop\work\异世界\游戏模式\apps\api
+> tsx watch src/main.ts
+
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [NestFactory] Starting Nest application...
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [InstanceLoader] AppModule dependencies initialized +10ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RoutesResolver] WorldController {/api/world}: +27ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RouterExplorer] Mapped {/api/world, POST} route +5ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RouterExplorer] Mapped {/api/world/:id, GET} route +2ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RouterExplorer] Mapped {/api/world/:id/actions, GET} route +1ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RouterExplorer] Mapped {/api/world/:id/log, GET} route +0ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [RouterExplorer] Mapped {/api/world/:id/act, POST} route +1ms
+[Nest] 37040  - 2026/07/22 17:26:13     LOG [NestApplication] Nest application successfully started +1ms
+17:26:29 [tsx] change in ./src\world.controller.ts Restarting...
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [NestFactory] Starting Nest application...
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [InstanceLoader] AppModule dependencies initialized +9ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RoutesResolver] WorldController {/api/world}: +32ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RouterExplorer] Mapped {/api/world, POST} route +2ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RouterExplorer] Mapped {/api/world/:id, GET} route +1ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RouterExplorer] Mapped {/api/world/:id/actions, GET} route +1ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RouterExplorer] Mapped {/api/world/:id/log, GET} route +0ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [RouterExplorer] Mapped {/api/world/:id/act, POST} route +1ms
+[Nest] 28972  - 2026/07/22 17:26:31     LOG [NestApplication] Nest application successfully started +1ms
+17:26:54 [tsx] change in ./..\..\packages\engine\dist\index.js Rerunning...
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [NestFactory] Starting Nest application...
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [InstanceLoader] AppModule dependencies initialized +8ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RoutesResolver] WorldController {/api/world}: +32ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RouterExplorer] Mapped {/api/world, POST} route +2ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RouterExplorer] Mapped {/api/world/:id, GET} route +1ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RouterExplorer] Mapped {/api/world/:id/actions, GET} route +1ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RouterExplorer] Mapped {/api/world/:id/log, GET} route +0ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [RouterExplorer] Mapped {/api/world/:id/act, POST} route +1ms
+[Nest] 43688  - 2026/07/22 17:26:55     LOG [NestApplication] Nest application successfully started +1ms
+17:33:30 [tsx] change in ./src\main.ts Rerunning...
+17:34:38 [tsx] change in ./src\main.ts Rerunning...
+17:37:40 [tsx] unlink in ./src\world.module.ts Rerunning...
