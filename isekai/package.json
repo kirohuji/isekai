@@ -3,9 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "packageManager": "pnpm@10.15.0",
+  "engines": { "node": ">=22" },
   "pnpm": { "onlyBuiltDependencies": ["better-sqlite3", "esbuild"] },
   "scripts": {
-    "dev": "pnpm --parallel --filter @gray-hill/api --filter @gray-hill/web dev",
-    "build": "pnpm -r build"
+    "dev": "pnpm run --filter @gray-hill/web dev & pnpm run --filter @gray-hill/api dev",
+    "dev:api": "pnpm run --filter @gray-hill/api dev",
+    "dev:web": "pnpm run --filter @gray-hill/web dev",
+    "build": "pnpm -r build",
+    "db:load": "pnpm run --filter @gray-hill/api db:load",
+    "db:reset": "pnpm run --filter @gray-hill/api db:reset"
   }
 }

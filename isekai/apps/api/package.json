@@ -9,15 +9,19 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:seed": "ts-node prisma/seed.ts"
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:load": "prisma db push && pnpm run db:seed",
+    "db:reset": "prisma db push --force-reset && pnpm run db:seed"
   },
   "dependencies": {
     "@colyseus/schema": "^4.0.0",
-    "@colyseus/ws-transport": "^0.18.0",
+    "@colyseus/ws-transport": "^0.17.13",
+    "@libsql/client": "^0.17.4",
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
-    "@prisma/client": "^7.0.0",
+    "@prisma/adapter-libsql": "^7.9.0",
+    "@prisma/client": "^7.9.0",
     "colyseus": "^0.17.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
@@ -26,7 +30,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@types/node": "^22.0.0",
-    "prisma": "^7.0.0",
+    "prisma": "^7.9.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.0"
   }

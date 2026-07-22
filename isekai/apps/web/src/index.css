@@ -1,15 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 85%;
-  --primary: 142 30% 55%;
-  --primary-foreground: 0 0% 7%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 55%;
-  --border: 0 0% 18%;
+@theme {
+  --color-border: hsl(0 0% 18%);
+  --color-background: hsl(0 0% 7%);
+  --color-foreground: hsl(0 0% 85%);
+  --color-primary: hsl(142 30% 55%);
+  --color-primary-foreground: hsl(0 0% 7%);
+  --color-muted: hsl(0 0% 14%);
+  --color-muted-foreground: hsl(0 0% 55%);
+  --font-mono: 'Noto Sans SC', monospace;
 }
 
 body {
@@ -17,4 +16,4 @@ body {
 }
 
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.2); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: hsl(0 0% 55% / 0.2); border-radius: 999px; }

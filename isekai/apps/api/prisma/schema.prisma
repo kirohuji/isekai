@@ -4,28 +4,27 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================
 // 角色基类——Player 和 Npc 的公共属性
 // ============================================
 model Character {
-  id          Int       @id @default(autoincrement())
-  name        String    @default("未命名")
-  gender      String    @default("男")
+  id          Int     @id @default(autoincrement())
+  name        String  @default("未命名")
+  gender      String  @default("男")
   description String?
   avatar      String?
-  isAlive     Boolean   @default(true)
+  isAlive     Boolean @default(true)
 
-  locationId  Int?
-  location    Location? @relation(fields: [locationId], references: [id])
+  locationId Int?
+  location   Location? @relation(fields: [locationId], references: [id])
 
-  player      Player?
-  npc         Npc?
+  player Player?
+  npc    Npc?
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ============================================
@@ -35,16 +34,16 @@ model Player {
   characterId Int       @id
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
-  health      Int       @default(100)
-  maxHealth   Int       @default(100)
-  stamina     Int       @default(100)
-  maxStamina  Int       @default(100)
-  mental      Int       @default(100)
-  maxMental   Int       @default(100)
-  silver      Int       @default(120)
-  copper      Int       @default(0)
-  foodDays    Int       @default(7)
-  medicineCount Int     @default(0)
+  health        Int @default(100)
+  maxHealth     Int @default(100)
+  stamina       Int @default(100)
+  maxStamina    Int @default(100)
+  mental        Int @default(100)
+  maxMental     Int @default(100)
+  silver        Int @default(120)
+  copper        Int @default(0)
+  foodDays      Int @default(7)
+  medicineCount Int @default(0)
 
   currentTimeBlock String @default("清晨")
   currentDateYear  Int    @default(847)
@@ -52,19 +51,19 @@ model Player {
   currentDateDay   Int    @default(15)
   redMoonCountdown Int    @default(700)
 
-  turnCount   Int       @default(0)
+  turnCount Int @default(0)
 
-  inventory   Inventory[]
-  flags       Flag[]
-  skills      Skill[]
-  quests      Quest[]
-  eventLogs   EventLog[]
-  reputations Reputation[]
-  party       Party[] @relation("playerParty")
-  relationshipsAsPlayer Relationship[]
+  inventory             Inventory[]
+  flags                 Flag[]
+  skills                Skill[]
+  quests                Quest[]
+  eventLogs             EventLog[]
+  reputations           Reputation[]
+  party                 Party[]        @relation("playerParty")
+  relationshipsAsPlayer Relationship[] @relation("playerRelationships")
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ============================================
@@ -74,23 +73,27 @@ model Npc {
   characterId Int       @id
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
-  race        String    @default("人类")
-  isRecruited Boolean   @default(false)
+  race            String  @default("人类")
+  isRecruited     Boolean @default(false)
+  isRecruitable   Boolean @default(false)
+  personalityType String?
+  occupation      String?
+  dialogueTopics  String  @default("[]")
 
-  relationshipsAsNpc Relationship[]
-  partyAsNpc         Party[] @relation("npcParty")
+  relationshipsAsNpc Relationship[] @relation("npcRelationships")
+  partyAsNpc         Party[]        @relation("npcParty")
 }
 
 // ============================================
 // 地点
 // ============================================
 model Location {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   region      String?
   description String?
-  isSafe      Boolean   @default(true)
-  travelCost  Int       @default(1)
+  isSafe      Boolean @default(true)
+  travelCost  Int     @default(1)
 
   connectedLocations String @default("[]")
   specialTags        String @default("[]")
@@ -99,29 +102,128 @@ model Location {
 }
 
 // ============================================
+// 静态游戏定义——由 apps/api/data 下的 CSV 维护
+// ============================================
+model ItemDefinition {
+  id             Int     @id
+  name           String
+  type           String
+  weight         Float
+  description    String
+  baseBuyPrice   Int
+  baseSellPrice  Int
+  equipModifiers String?
+}
+
+model SkillDefinition {
+  id           String @id
+  name         String
+  category     String
+  maxLevel     Int
+  levelEffects String
+}
+
+model EnemyDefinition {
+  id      Int    @id
+  name    String
+  attack  Int
+  defense Int
+  maxHp   Int
+  loot    String
+  region  String
+}
+
+model MerchantDefinition {
+  id            Int    @id
+  npcId         Int
+  name          String
+  priceModifier Float
+  sells         String
+  buys          String
+}
+
+model RuleDefinition {
+  id              String @id
+  name            String
+  bindType        String
+  bindId          String
+  conditionType   String
+  conditionParams String
+  effectType      String
+  effectParams    String
+  priority        Int
+  description     String
+}
+
+model QuestTemplate {
+  id             String  @id
+  name           String
+  description    String
+  category       String
+  isMain         Boolean
+  isAbandonable  Boolean
+  timeoutTurns   Int
+  activationFlag String
+  stage1Name     String
+  stage1Desc     String
+  stage1Cond     String
+  stage2Name     String
+  stage2Desc     String
+  stage2Cond     String
+  stage3Name     String
+  stage3Desc     String
+  stage3Cond     String
+  rewards        String
+}
+
+model DialogueTopic {
+  npcId         Int
+  topicId       String
+  topicLabel    String
+  topicCategory String
+  condition     String
+  oneTime       Boolean
+  inkFile       String?
+
+  @@id([npcId, topicId])
+}
+
+model CraftingRecipe {
+  id              Int    @id
+  name            String
+  inputItems      String
+  inputQuantities String
+  outputItem      String
+  outputQuantity  Int
+  requiredSkill   String
+  requiredLevel   Int
+  craftTimeBlocks Int
+}
+
+// ============================================
 // 物品
 // ============================================
 model Inventory {
-  id          Int      @id @default(autoincrement())
-  playerId    Int
-  player      Player   @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
   itemName    String
-  itemType    String   @default("misc")
-  quantity    Int      @default(1)
+  itemType    String  @default("misc")
+  quantity    Int     @default(1)
   description String?
-  isEquipped  Boolean  @default(false)
+  isEquipped  Boolean @default(false)
 }
 
 // ============================================
 // 好感度/关系
 // ============================================
 model Relationship {
-  id        Int @id @default(autoincrement())
-  playerId  Int
-  player    Player @relation("playerRelationships", fields: [playerId], references: [characterId], onDelete: Cascade)
-  npcId     Int
-  npc       Npc    @relation("npcRelationships", fields: [npcId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation("playerRelationships", fields: [playerId], references: [characterId], onDelete: Cascade)
+  npcId    Int
+  npc      Npc    @relation("npcRelationships", fields: [npcId], references: [characterId], onDelete: Cascade)
 
   affection Int    @default(0)
   trust     Int    @default(0)
@@ -134,9 +236,9 @@ model Relationship {
 // 势力声望
 // ============================================
 model Reputation {
-  id          Int    @id @default(autoincrement())
-  playerId    Int
-  player      Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
   factionName String
   reputation  Int    @default(0)
@@ -148,13 +250,13 @@ model Reputation {
 // 技能
 // ============================================
 model Skill {
-  id          Int    @id @default(autoincrement())
-  playerId    Int
-  player      Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
-  skillName   String
-  level       Int    @default(1)
-  experience  Int    @default(0)
+  skillName  String
+  level      Int    @default(1)
+  experience Int    @default(0)
 
   @@unique([playerId, skillName])
 }
@@ -163,16 +265,16 @@ model Skill {
 // 事件模板
 // ============================================
 model EventTemplate {
-  id            Int    @id @default(autoincrement())
-  name          String
-  category      String
+  id       Int    @id @default(autoincrement())
+  name     String
+  category String
 
   narrativeBase String
-  conditionJson String @default("{}")
-  choicesJson   String @default("[]")
-  cooldownDays  Int    @default(0)
+  conditionJson String  @default("{}")
+  choicesJson   String  @default("[]")
+  cooldownDays  Int     @default(0)
   isRepeatable  Boolean @default(true)
-  priority      Int    @default(5)
+  priority      Int     @default(5)
 
   eventLogs EventLog[]
 }
@@ -181,9 +283,9 @@ model EventTemplate {
 // 事件日志
 // ============================================
 model EventLog {
-  id              Int    @id @default(autoincrement())
-  playerId        Int
-  player          Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
   eventTemplateId Int?
   eventTemplate   EventTemplate? @relation(fields: [eventTemplateId], references: [id])
@@ -201,9 +303,9 @@ model EventLog {
 // 全局标记
 // ============================================
 model Flag {
-  id        Int    @id @default(autoincrement())
-  playerId  Int
-  player    Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
   flagName  String
   flagValue String?
@@ -215,24 +317,24 @@ model Flag {
 // 任务
 // ============================================
 model Quest {
-  id               Int    @id @default(autoincrement())
-  playerId         Int
-  player           Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
 
   questName        String
   questDescription String?
-  questStatus      String @default("进行中")
+  questStatus      String  @default("进行中")
 }
 
 // ============================================
 // 队伍成员
 // ============================================
 model Party {
-  id        Int @id @default(autoincrement())
-  playerId  Int
-  player    Player @relation("playerParty", fields: [playerId], references: [characterId], onDelete: Cascade)
-  npcId     Int
-  npc       Npc    @relation("npcParty", fields: [npcId], references: [characterId], onDelete: Cascade)
+  id       Int    @id @default(autoincrement())
+  playerId Int
+  player   Player @relation("playerParty", fields: [playerId], references: [characterId], onDelete: Cascade)
+  npcId    Int
+  npc      Npc    @relation("npcParty", fields: [npcId], references: [characterId], onDelete: Cascade)
 
-  role      String @default("成员")
+  role String @default("成员")
 }

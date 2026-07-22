@@ -1,13 +1,17 @@
 import { cn } from '@/lib/utils'
 
-/** 行动面板 — 显示可选操作列表 */
+interface GameAction {
+  id: string; title: string; description: string
+  category: string; reason?: string
+}
+
 export function ActionPanel({
   actions,
   onSelect,
   disabled,
 }: {
-  actions: string[]
-  onSelect: (index: number) => void
+  actions: GameAction[]
+  onSelect: (id: string) => void
   disabled: boolean
 }) {
   if (actions.length === 0) {
@@ -16,6 +20,10 @@ export function ActionPanel({
         暂无可用行动
       </div>
     )
+  }
+
+  const icons: Record<string, string> = {
+    rest: '😴', 探索: '🔍', 工作: '🪓', 社交: '💬', 移动: '🚶',
   }
 
   return (
@@ -27,17 +35,22 @@ export function ActionPanel({
         <button
           key={i}
           disabled={disabled}
-          onClick={() => onSelect(i + 1)}
+          onClick={() => onSelect(action.id)}
           className={cn(
             'w-full text-left px-3 py-2 text-sm transition-colors',
             'hover:bg-muted/50 active:bg-muted',
             'disabled:opacity-30 disabled:cursor-not-allowed',
-            'animate-slide-up',
+            'flex items-center gap-2',
           )}
           style={{ animationDelay: `${i * 40}ms` }}
         >
-          <span className="text-primary mr-2">{i + 1}.</span>
-          {action}
+          <span className="text-base">{icons[action.category] ?? '▶️'}</span>
+          <div className="flex-1">
+            <span>{action.title}</span>
+            {action.description && (
+              <span className="text-xs text-muted-foreground ml-2">{action.description}</span>
+            )}
+          </div>
         </button>
       ))}
     </div>
