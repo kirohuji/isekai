@@ -1,9 +1,0 @@
-{
-  "name": "@gray-hill/api",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": { "dev": "tsx watch src/main.ts", "build": "tsc -p tsconfig.json", "start": "node dist/main.js", "db:reset": "tsx src/seed.ts" },
-  "dependencies": { "@gray-hill/engine": "workspace:*", "@nestjs/common": "^11.0.7", "@nestjs/core": "^11.0.7", "@nestjs/platform-express": "^11.0.7", "class-transformer": "^0.5.1", "class-validator": "^0.14.1", "dotenv": "^16.4.7", "inkjs": "^2.3.2", "reflect-metadata": "^0.2.2", "rxjs": "^7.8.1" },
-  "devDependencies": { "@types/node": "^22.13.4", "tsx": "^4.19.2", "typescript": "^5.7.3" }
-}
