@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 角色基类——Player 和 Npc 的公共属性
+// ============================================
+model Character {
+  id          Int       @id @default(autoincrement())
+  name        String    @default("未命名")
+  gender      String    @default("男")
+  description String?
+  avatar      String?
+  isAlive     Boolean   @default(true)
+
+  locationId  Int?
+  location    Location? @relation(fields: [locationId], references: [id])
+
+  player      Player?
+  npc         Npc?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ============================================
+// 玩家——游戏主角
+// ============================================
+model Player {
+  characterId Int       @id
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  health      Int       @default(100)
+  maxHealth   Int       @default(100)
+  stamina     Int       @default(100)
+  maxStamina  Int       @default(100)
+  mental      Int       @default(100)
+  maxMental   Int       @default(100)
+  silver      Int       @default(120)
+  copper      Int       @default(0)
+  foodDays    Int       @default(7)
+  medicineCount Int     @default(0)
+
+  currentTimeBlock String @default("清晨")
+  currentDateYear  Int    @default(847)
+  currentDateMonth Int    @default(9)
+  currentDateDay   Int    @default(15)
+  redMoonCountdown Int    @default(700)
+
+  turnCount   Int       @default(0)
+
+  inventory   Inventory[]
+  flags       Flag[]
+  skills      Skill[]
+  quests      Quest[]
+  eventLogs   EventLog[]
+  reputations Reputation[]
+  party       Party[] @relation("playerParty")
+  relationshipsAsPlayer Relationship[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ============================================
+// NPC——非玩家角色
+// ============================================
+model Npc {
+  characterId Int       @id
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  race        String    @default("人类")
+  isRecruited Boolean   @default(false)
+
+  relationshipsAsNpc Relationship[]
+  partyAsNpc         Party[] @relation("npcParty")
+}
+
+// ============================================
+// 地点
+// ============================================
+model Location {
+  id          Int       @id @default(autoincrement())
+  name        String
+  region      String?
+  description String?
+  isSafe      Boolean   @default(true)
+  travelCost  Int       @default(1)
+
+  connectedLocations String @default("[]")
+  specialTags        String @default("[]")
+
+  characters Character[]
+}
+
+// ============================================
+// 物品
+// ============================================
+model Inventory {
+  id          Int      @id @default(autoincrement())
+  playerId    Int
+  player      Player   @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  itemName    String
+  itemType    String   @default("misc")
+  quantity    Int      @default(1)
+  description String?
+  isEquipped  Boolean  @default(false)
+}
+
+// ============================================
+// 好感度/关系
+// ============================================
+model Relationship {
+  id        Int @id @default(autoincrement())
+  playerId  Int
+  player    Player @relation("playerRelationships", fields: [playerId], references: [characterId], onDelete: Cascade)
+  npcId     Int
+  npc       Npc    @relation("npcRelationships", fields: [npcId], references: [characterId], onDelete: Cascade)
+
+  affection Int    @default(0)
+  trust     Int    @default(0)
+  status    String @default("陌生人")
+
+  @@unique([playerId, npcId])
+}
+
+// ============================================
+// 势力声望
+// ============================================
+model Reputation {
+  id          Int    @id @default(autoincrement())
+  playerId    Int
+  player      Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  factionName String
+  reputation  Int    @default(0)
+
+  @@unique([playerId, factionName])
+}
+
+// ============================================
+// 技能
+// ============================================
+model Skill {
+  id          Int    @id @default(autoincrement())
+  playerId    Int
+  player      Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  skillName   String
+  level       Int    @default(1)
+  experience  Int    @default(0)
+
+  @@unique([playerId, skillName])
+}
+
+// ============================================
+// 事件模板
+// ============================================
+model EventTemplate {
+  id            Int    @id @default(autoincrement())
+  name          String
+  category      String
+
+  narrativeBase String
+  conditionJson String @default("{}")
+  choicesJson   String @default("[]")
+  cooldownDays  Int    @default(0)
+  isRepeatable  Boolean @default(true)
+  priority      Int    @default(5)
+
+  eventLogs EventLog[]
+}
+
+// ============================================
+// 事件日志
+// ============================================
+model EventLog {
+  id              Int    @id @default(autoincrement())
+  playerId        Int
+  player          Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  eventTemplateId Int?
+  eventTemplate   EventTemplate? @relation(fields: [eventTemplateId], references: [id])
+  eventName       String
+  choiceMade      String?
+  outcome         String?
+
+  triggeredAtYear      Int
+  triggeredAtMonth     Int
+  triggeredAtDay       Int
+  triggeredAtTimeBlock String
+}
+
+// ============================================
+// 全局标记
+// ============================================
+model Flag {
+  id        Int    @id @default(autoincrement())
+  playerId  Int
+  player    Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  flagName  String
+  flagValue String?
+
+  @@unique([playerId, flagName])
+}
+
+// ============================================
+// 任务
+// ============================================
+model Quest {
+  id               Int    @id @default(autoincrement())
+  playerId         Int
+  player           Player @relation(fields: [playerId], references: [characterId], onDelete: Cascade)
+
+  questName        String
+  questDescription String?
+  questStatus      String @default("进行中")
+}
+
+// ============================================
+// 队伍成员
+// ============================================
+model Party {
+  id        Int @id @default(autoincrement())
+  playerId  Int
+  player    Player @relation("playerParty", fields: [playerId], references: [characterId], onDelete: Cascade)
+  npcId     Int
+  npc       Npc    @relation("npcParty", fields: [npcId], references: [characterId], onDelete: Cascade)
+
+  role      String @default("成员")
+}

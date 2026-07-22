@@ -1,0 +1,11 @@
+{
+  "name": "gray-hill",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.15.0",
+  "pnpm": { "onlyBuiltDependencies": ["better-sqlite3", "esbuild"] },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @gray-hill/api --filter @gray-hill/web dev",
+    "build": "pnpm -r build"
+  }
+}
