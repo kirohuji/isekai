@@ -25,11 +25,11 @@ interface GameStore {
 }
 
 const defaultState: GameState = {
-  location: '灰丘', region: '东南边境',
-  dateDisplay: '光明历847年 九月 第15天', timeBlock: '清晨',
+  location: '王都·召唤广场', region: '王都神殿区',
+  dateDisplay: '光明历847年 三月 第1天', timeBlock: '上午',
   hp: 100, maxHp: 100, sp: 100, maxSp: 100,
-  mp: 100, maxMp: 100, silver: 120, foodDays: 7,
-  weather: '晴朗', season: '秋', turn: 0,
+  mp: 90, maxMp: 100, silver: 120, foodDays: 0,
+  weather: '晴朗', season: '春', turn: 0,
 }
 
 export const useGameStore = create<GameStore>((set) => ({

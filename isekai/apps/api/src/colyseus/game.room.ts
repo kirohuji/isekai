@@ -2,7 +2,8 @@ import { Room, Client } from 'colyseus'
 import { GameState, Player } from './game.state'
 import { TurnManager } from '../engine/turn/turn-manager'
 import { BUILTIN_ACTIONS } from '../engine/actions/builtin-actions'
-import { Season, Weather, getSeason } from '../engine/types'
+import { Season, TimeBlock, Weather, getSeason } from '../engine/types'
+import { NarrativeChoice, NarrativeService } from '../narrative/narrative.service'
 
 /**
  * Colyseus 游戏房间
@@ -13,6 +14,9 @@ import { Season, Weather, getSeason } from '../engine/types'
 export class GameRoom extends Room<{ state: GameState }> {
   maxClients = 8
   private turnManager = new TurnManager()
+  private narrativeService = new NarrativeService()
+  private narrativeHistory: Array<{ role: 'player' | 'narrator'; content: string }> = []
+  private currentChoices: NarrativeChoice[] = []
 
   onCreate(_options: any) {
     this.setState(new GameState())
@@ -20,15 +24,29 @@ export class GameRoom extends Room<{ state: GameState }> {
 
     this.turnManager.initialize({
       playerName: '旅者',
-      locationId: 10,
+      locationId: 76,
+      locationName: '王都·召唤广场',
+      region: '王都神殿区',
+      locationTags: ['city', 'outdoor', 'holy', 'summoning'],
       weather: Weather.晴朗,
-      season: getSeason(9),
+      season: getSeason(3),
+      year: 847,
+      month: 3,
+      day: 1,
+      timeBlock: TimeBlock.上午,
+      initialFoodDays: 0,
+      initialMental: 90,
     })
     this.turnManager.registerActions(BUILTIN_ACTIONS)
 
     // 玩家选择了行动
     this.onMessage('action', (client, data: { actionId: string; customInput?: string }) => {
       console.log(`[GameRoom] action from ${client.sessionId}:`, data)
+
+      if (data.actionId.startsWith('ai:')) {
+        void this.continueNarrative(data.actionId.slice(3))
+        return
+      }
 
       // 用 TurnManager 执行完整回合
       const result = this.turnManager.executeTurn(data.actionId, data.customInput)
@@ -66,16 +84,8 @@ export class GameRoom extends Room<{ state: GameState }> {
     player.name = '旅者'
     this.state.players.set(client.sessionId, player)
 
-    // 新玩家加入时，发送初始叙事
-    setTimeout(() => {
-      this.pushNarrative('你站在灰丘的高地上。面前是一间半塌的石基木屋，和一个塌了大半的储藏坑。\n\n风吹过荒地，带着几分秋日的凉意。远处的苇水村升起炊烟——但他们也知道，粮食撑不了太久了。\n\n你必须想办法让所有人活下去。')
-      this.pushActions([
-        { id: 'rest', title: '休息', description: '恢复 HP 和 SP', category: 'rest' },
-        { id: 'explore', title: '探索周边', description: '消耗 15 SP', category: '探索' },
-        { id: 'talk', title: '交谈', description: '消耗 5 SP', category: '社交' },
-        { id: 'move', title: '前往下个地点', description: '消耗 10 SP', category: '移动' },
-      ])
-    }, 500)
+    // 每局由 AI 主持人生成第一幕与场景化选项；网络故障时使用本地保底场景。
+    setTimeout(() => void this.beginNarrative(), 500)
   }
 
   onLeave(client: Client) {
@@ -97,5 +107,59 @@ export class GameRoom extends Room<{ state: GameState }> {
 
   pushActions(actions: any[]): void {
     this.broadcast('actions', actions)
+  }
+
+  private async beginNarrative(): Promise<void> {
+    this.narrativeHistory = []
+    try {
+      await this.generateNarrative()
+    } catch (error) {
+      console.error('[Narrative] opening generation failed:', error instanceof Error ? error.message : error)
+      this.presentNarrative({
+        narrative: '光芒熄灭时，你发现自己跪在一座陌生的白石圆厅中。五十名同学散落在发光的召唤阵边缘，灰袍神官正将人群分开。\n\n一名神官翻看木牌，平静地宣布你是“无能力者”。他把一袋安置金推到桌边，却没有解释你们为什么会在这里。',
+        choices: [
+          { id: 'ask_priest', label: '追问神官', description: '要求解释召唤与安置安排' },
+          { id: 'watch_classmates', label: '观察同学的去向', description: '确认谁被神殿带离广场' },
+        ],
+      })
+    }
+  }
+
+  private async continueNarrative(choiceId: string): Promise<void> {
+    const choice = this.currentChoices.find(item => item.id === choiceId)
+    if (!choice) return
+    this.narrativeHistory.push({ role: 'player', content: choice.label })
+    this.state.turn += 1
+    try {
+      await this.generateNarrative(choice.label)
+    } catch (error) {
+      console.error('[Narrative] continuation failed:', error instanceof Error ? error.message : error)
+      this.pushNarrative('神官的目光停在你身上片刻，周围的嘈杂声却没有停止。你意识到，必须先弄清楚谁在安排这一切。')
+      this.pushActions(this.currentChoices.map(item => ({ id: `ai:${item.id}`, title: item.label, description: item.description, category: '社交' })))
+    }
+  }
+
+  private async generateNarrative(playerChoice?: string): Promise<void> {
+    const ctx = this.turnManager.getContext()
+    const beat = await this.narrativeService.generate({
+      location: this.state.location,
+      region: this.state.region,
+      date: this.state.dateDisplay,
+      timeBlock: this.state.timeBlock,
+      turn: this.state.turn,
+      player: { hp: ctx.player.hp, sp: ctx.player.sp, mp: ctx.player.mp, silver: ctx.player.silver, foodDays: ctx.player.foodDays },
+      history: this.narrativeHistory.slice(-8),
+      playerChoice,
+    })
+    this.presentNarrative(beat)
+  }
+
+  private presentNarrative(beat: { narrative: string; choices: NarrativeChoice[] }): void {
+    this.currentChoices = beat.choices
+    this.narrativeHistory.push({ role: 'narrator', content: beat.narrative })
+    this.pushNarrative(beat.narrative)
+    this.pushActions(beat.choices.map(choice => ({
+      id: `ai:${choice.id}`, title: choice.label, description: choice.description, category: '叙事',
+    })))
   }
 }

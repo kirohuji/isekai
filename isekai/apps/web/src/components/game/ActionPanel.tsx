@@ -27,9 +27,9 @@ export function ActionPanel({
   }
 
   return (
-    <div className="border border-border rounded divide-y divide-border">
-      <div className="px-3 py-1.5 text-xs text-muted-foreground font-medium">
-        📋 可选行动
+    <section className="overflow-hidden rounded-lg border border-border bg-muted/20 divide-y divide-border">
+      <div className="px-4 py-3 text-xs font-medium tracking-[0.16em] text-muted-foreground">
+        可选行动
       </div>
       {actions.map((action, i) => (
         <button
@@ -37,8 +37,8 @@ export function ActionPanel({
           disabled={disabled}
           onClick={() => onSelect(action.id)}
           className={cn(
-            'w-full text-left px-3 py-2 text-sm transition-colors',
-            'hover:bg-muted/50 active:bg-muted',
+            'w-full text-left px-4 py-3 text-sm transition-colors',
+            'hover:bg-primary/10 active:bg-muted',
             'disabled:opacity-30 disabled:cursor-not-allowed',
             'flex items-center gap-2',
           )}
@@ -53,6 +53,6 @@ export function ActionPanel({
           </div>
         </button>
       ))}
-    </div>
+    </section>
   )
 }

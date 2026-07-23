@@ -22,6 +22,13 @@ export class ActionGatingEngine {
   private gateOne(action: ActionDef, ctx: TurnContext): GatedAction {
     const req = action.requirements
 
+    if (req.requiredFlags?.some(flag => !ctx.flags.get(flag) || ctx.flags.get(flag) === 'false')) {
+      return { action, available: false, reason: '尚未满足前置条件' }
+    }
+    if (req.forbiddenFlags?.some(flag => ctx.flags.get(flag) && ctx.flags.get(flag) !== 'false')) {
+      return { action, available: false, reason: '此行动已完成' }
+    }
+
     // 1. 时间门控
     if (req.timeBlocks && !req.timeBlocks.includes(ctx.timeBlock as any)) {
       return { action, available: false, reason: `仅限${req.timeBlocks.join('、')}` }

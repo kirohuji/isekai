@@ -4,15 +4,15 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 export function NarrativePanel({ text }: { text: string }) {
   if (!text) {
     return (
-      <div className="flex-1 flex items-center justify-center text-muted-foreground text-sm">
+      <div className="flex flex-1 items-center justify-center p-5 text-sm text-muted-foreground">
         等待命运的齿轮开始转动...
       </div>
     )
   }
 
   return (
-    <ScrollArea className="flex-1 border border-border rounded p-4">
-      <div className="text-sm leading-relaxed whitespace-pre-wrap animate-fade-in">
+    <ScrollArea className="min-h-[52vh] flex-1 p-5 lg:min-h-[calc(100vh-10rem)]">
+      <div className="mx-auto max-w-3xl whitespace-pre-wrap text-[15px] leading-8 animate-fade-in">
         {text}
       </div>
     </ScrollArea>

@@ -21,10 +21,10 @@ export class Player extends Schema {
 
 /** 房间状态 — 仅结构化数据 */
 export class GameState extends Schema {
-  @type('string') location: string = '旧鹿角旅馆'
-  @type('string') region: string = '王都平民区'
-  @type('string') dateDisplay: string = '光明历847年 九月 第15天'
-  @type('string') timeBlock: string = '清晨'
+  @type('string') location: string = '王都·召唤广场'
+  @type('string') region: string = '王都神殿区'
+  @type('string') dateDisplay: string = '光明历847年 三月 第1天'
+  @type('string') timeBlock: string = '上午'
   @type('number') turn: number = 0
 
   @type({ map: Player }) players = new MapSchema<Player>()

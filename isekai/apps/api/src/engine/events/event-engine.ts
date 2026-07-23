@@ -11,6 +11,10 @@ export class EventEngine {
   /** 每回合检测——返回触发的事件（如果需要玩家选择则标记为待处理） */
   check(ctx: TurnContext): TriggeredEvent | null {
     this.triggeredThisTurn = []
+    // 召唤广场是手写开局场景；在玩家离开前，不允许随机世界事件打断引导。
+    const locationTags = JSON.parse(ctx.flags.get('_locationTags') ?? '[]') as string[]
+    if (locationTags.includes('summoning')) return null
+
     const templates = eventTemplateRepo.getAll().filter(t => !this.cooldowns.has(t.id) || this.cooldowns.get(t.id)! <= 0)
 
     // 按优先级排序，取最高
@@ -92,14 +96,34 @@ export class EventEngine {
     try {
       const cond = JSON.parse(tpl.conditionJson)
       if (cond.location_tags) {
-        const locTags = ctx.flags.get('_locationTags') ?? ''
-        if (!cond.location_tags.some((t: string) => locTags.includes(t))) return false
+        const locTags = JSON.parse(ctx.flags.get('_locationTags') ?? '[]') as string[]
+        if (!cond.location_tags.some((tag: string) => locTags.includes(tag))) return false
       }
-      if (cond.food_days !== undefined) {
-        const op = cond.food_op ?? '<='
-        if (op === '<=') { if (!(ctx.player.foodDays <= cond.food_days)) return false }
-        else if (op === '>=') { if (!(ctx.player.foodDays >= cond.food_days)) return false }
+      if (cond.location !== undefined && Number(cond.location) !== ctx.locationId) return false
+      if (cond.time_block && !matches(cond.time_block, ctx.timeBlock)) return false
+      if (cond.season && !matches(cond.season, ctx.season)) return false
+      if (cond.weather && !matches(cond.weather, ctx.weather)) return false
+      if (cond.min_turn !== undefined && ctx.turn < Number(cond.min_turn)) return false
+
+      if (cond.flag) {
+        const actual = ctx.flags.get(cond.flag)
+        if (cond.flag_op) {
+          if (!compare(actual, cond.flag_op, cond.flag_val)) return false
+        } else if (!actual || actual === 'false') {
+          return false
+        }
       }
+      if (cond.food_days !== undefined || cond.food_val !== undefined) {
+        const target = Number(cond.food_val ?? cond.food_days)
+        if (!compare(ctx.player.foodDays, cond.food_op ?? '<=', target)) return false
+      }
+      if (cond.hp_ratio !== undefined || cond.hp_val !== undefined) {
+        const target = Number(cond.hp_val ?? cond.hp_ratio)
+        if (!compare(ctx.player.hp / ctx.player.maxHp, cond.hp_ratio ?? '<=', target)) return false
+      }
+
+      // 尚未实现 NPC/队伍/技能判断的事件必须等待对应系统接入，不能无条件触发。
+      if (cond.npc || cond.npc_conflict || cond.npc_in_party || cond.npc_nearby || cond.skill || cond.minSkill || cond.affection_min || cond.red_moon_near) return false
       if (cond.random_chance && Math.random() * 100 > cond.random_chance) return false
       return true
     } catch { return false }
@@ -115,10 +139,28 @@ export class EventEngine {
   }
 }
 
+function matches(condition: string | string[], actual: string): boolean {
+  return Array.isArray(condition) ? condition.includes(actual) : condition === actual
+}
+
+function compare(actual: string | number | undefined, operator: string, expected: string | number | undefined): boolean {
+  if (actual === undefined || expected === undefined) return false
+  const actualNumber = Number(actual)
+  const expectedNumber = Number(expected)
+  const numeric = Number.isFinite(actualNumber) && Number.isFinite(expectedNumber)
+  const left = numeric ? actualNumber : String(actual)
+  const right = numeric ? expectedNumber : String(expected)
+  if (operator === '>=') return left >= right
+  if (operator === '<=') return left <= right
+  if (operator === '!=') return left !== right
+  return left === right
+}
+
 function fmt(text: string, ctx: TurnContext): string {
   return text.replace(/\{location\}/g, ctx.flags.get('_locationName') ?? '此处')
     .replace(/\{weather\}/g, ctx.weather)
     .replace(/\{timeBlock\}/g, ctx.timeBlock)
+    .replace(/\{food\}/g, String(ctx.player.foodDays))
 }
 
 export interface TriggeredEvent {

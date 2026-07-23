@@ -90,7 +90,7 @@ export function loadLocations(): LocationDef[] {
 
 function getDefaultFacilities(_locId: number, tags: string[]): FacilityDef[] {
   const facilities: FacilityDef[] = []
-  if (tags.includes('indoor') || tags.includes('city')) {
+  if (tags.includes('indoor')) {
     facilities.push({ id: 'rest_spot', name: '休息处', description: '可以休息的地方', actions: [{ actionId: 'rest' }], state: 'available' })
   }
   if (tags.includes('wild')) {

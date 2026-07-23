@@ -168,6 +168,7 @@ export interface ActionReq {
   spCost?: number; minSp?: number; minHp?: number; minMp?: number
   skills?: SkillReq[]; items?: ItemReq[]
   timeBlocks?: TimeBlock[]; locationTags?: string[]
+  requiredFlags?: string[]; forbiddenFlags?: string[]
   personality?: Partial<PersonalityProfile & Record<string, { min: number; max?: number }>>
 }
 
